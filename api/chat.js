@@ -1,19 +1,19 @@
 import { GoogleGenAI } from "@google/genai";
 
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
-    });
-
     const { message, systemPrompt } = req.body;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.5-flash-lite",
       contents: message,
       config: {
         systemInstruction: systemPrompt,
@@ -27,7 +27,6 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error("Gemini Error:", err);
-
     return res.status(500).json({
       error: err.message,
     });

@@ -81,3 +81,48 @@
     font-size: 18px;
   }
 }
+
+/* ===========================
+   MOBILE RESPONSIVE NAVBAR
+=========================== */
+@media screen and (max-width: 768px) {
+
+  .header{
+    width:100%;
+    padding:18px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    z-index:999;
+  }
+
+  .navbar-title{
+    font-size:28px;
+  }
+
+  /* Hide email on mobile */
+  .navbar-connect{
+    display:none;
+  }
+
+  .header ul{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+    margin:0;
+    padding:0;
+  }
+
+  .header ul li a{
+    font-size:14px;
+    letter-spacing:1px;
+  }
+
+  .landing-circle1,
+  .landing-circle2{
+    width:180px;
+    height:180px;
+    filter:blur(70px);
+  }
+}

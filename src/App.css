@@ -27,3 +27,57 @@
     max-width: var(--cWidth);
   }
 }
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+  .hero,
+  .hero-section,
+  .landing {
+    width: 100%;
+    min-height: 100vh;
+    padding: 90px 20px 30px;
+    overflow: hidden;
+  }
+
+  .hero h1,
+  .hero-title {
+    font-size: 48px !important;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .hero h2,
+  .hero-subtitle {
+    font-size: 18px !important;
+    text-align: center;
+    letter-spacing: 3px;
+  }
+
+  .hero-content{
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .hero img,
+  .profile-image{
+    width: 220px !important;
+    height: 220px !important;
+    object-fit: cover;
+  }
+
+  .navbar{
+    padding: 18px 20px;
+  }
+
+  .nav-links{
+    gap: 16px;
+    font-size: 14px;
+  }
+
+  .resume{
+    right: 10px;
+    font-size: 13px;
+  }
+}
