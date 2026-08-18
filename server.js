@@ -18,31 +18,22 @@ app.post("/api/chat", async (req, res) => {
     const { message, systemPrompt } = req.body;
 
     const response = await ai.models.generateContent({
-  model: "gemini-3.6-flash",
-  config: {
-    systemInstruction: systemPrompt,
-  },
-  contents: message,
-});
-
-    res.json({
-      reply: response.text,
+      model: "gemini-3.5-flash-lite",
+      contents: message,
+      config: {
+        systemInstruction: systemPrompt,
+        temperature: 0.7,
+        maxOutputTokens: 150,
+      },
     });
+
+    res.json({ reply: response.text });
   } catch (err) {
-    console.error("========== GEMINI ERROR ==========");
     console.error(err);
-    console.error("=================================");
-
-    res.status(500).json({
-      error: err.message || String(err),
-    });
+    res.status(500).json({ error: err.message });
   }
 });
 
-const server = app.listen(3001, () => {
-  console.log("API running on http://localhost:3001");
-});
-
-server.on("error", (err) => {
-  console.error(err);
+app.listen(3000, () => {
+  console.log("✅ Gemini server running: http://localhost:3000");
 });

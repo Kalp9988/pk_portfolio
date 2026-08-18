@@ -57,6 +57,8 @@ Always reply as Kalp in first person. Never say you're an AI.
 `;
 
 const Play = () => {
+
+  
   const [game, setGame] = useState(new Chess());
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<Square[]>([]);
@@ -75,7 +77,7 @@ const Play = () => {
     { role: 'assistant', content: "Hello! I'm Kalp Patel 👋 Ask me anything about web development, UI/UX, React, Next.js or my projects." }
   ]);
   const [chatInput, setChatInput] = useState('');
-  const [isTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const files = boardFlipped ? ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'] : ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
   const ranks = boardFlipped ? ['1', '2', '3', '4', '5', '6', '7', '8'] : ['8', '7', '6', '5', '4', '3', '2', '1'];
@@ -114,12 +116,22 @@ const Play = () => {
     if (game.turn() === 'b' && !game.isGameOver() && redoxchessRef.current) {
       setEngineThinking(true);
       redoxchessRef.current.setPosition(game.fen());
-      redoxchessRef.current.getBestMove((move) => {
-        const from = move.substring(0, 2) as Square;
-        const to = move.substring(2, 4) as Square;
-        makeMove(from, to);
-        setEngineThinking(false);
-      }, 12);
+
+redoxchessRef.current.getBestMove(
+  (bestMove) => {
+    if (!bestMove || bestMove.length < 4) {
+      setEngineThinking(false);
+      return;
+    }
+
+    const from = bestMove.slice(0, 2) as Square;
+    const to = bestMove.slice(2, 4) as Square;
+
+    makeMove(from, to);
+    setEngineThinking(false);
+  },
+  12
+);
     }
   }, [game]);
 
@@ -218,14 +230,15 @@ const Play = () => {
   const sendMessage = async () => {
   if (!chatInput.trim()) return;
 
-  const userText = chatInput;
+  const userMessage = chatInput;
+  setChatInput("");
 
   setChatMessages((prev) => [
     ...prev,
-    { role: "user", content: userText },
+    { role: "user", content: userMessage },
   ]);
 
-  setChatInput("");
+  setIsTyping(true);
 
   try {
     const res = await fetch("/api/chat", {
@@ -234,7 +247,7 @@ const Play = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        message: userText,
+        message: userMessage,
         systemPrompt: SYSTEM_PROMPT,
       }),
     });
@@ -245,17 +258,19 @@ const Play = () => {
       ...prev,
       {
         role: "assistant",
-        content: data.reply,
+        content: data.reply || "Sorry, something went wrong.",
       },
     ]);
-  } catch (err) {
+  } catch {
     setChatMessages((prev) => [
       ...prev,
       {
         role: "assistant",
-        content: "Server connection failed 😅",
+        content: "⚠️ Server connection failed. Please try again.",
       },
     ]);
+  } finally {
+    setIsTyping(false);
   }
 };
 
@@ -266,13 +281,22 @@ const Play = () => {
     }
   };
 
-  const renderPiece = (piece: { type: PieceSymbol; color: Color } | null) => {
-    if (!piece) return null;
-    const key = `${piece.color}${piece.type.toUpperCase()}`;
-    const svg = PIECES[key];
-    if (!svg) return null;
-    return <div className="chess-piece" dangerouslySetInnerHTML={{ __html: svg }} />;
-  };
+  const renderPiece = (
+  piece: { type: PieceSymbol; color: Color } | null
+) => {
+  if (!piece) return null;
+
+  const key = `${piece.color}${piece.type.toUpperCase()}`;
+
+  return (
+    <div
+      className="chess-piece"
+      dangerouslySetInnerHTML={{
+        __html: PIECES[key],
+      }}
+    />
+  );
+};
 
   const isSquareLight = (file: string, rank: string): boolean => {
     const fileIndex = 'abcdefgh'.indexOf(file);
